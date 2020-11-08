@@ -1,0 +1,4 @@
+/target/
+/.idea/
+/src/main/data/
+/spark-warehouse/
