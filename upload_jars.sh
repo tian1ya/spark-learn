@@ -5,5 +5,7 @@ scp /Users/xuxliu/Ifoods/scala/spark/myDevEnv/target/learning-1.0-SNAPSHOT.jar r
 
 # learning-1.0-SNAPSHOT.jar
 
-#./bin/spark-submit --master spark://spark-master:7077  --class com.bigData.spark.core.wordCount /opt/bigData/spark/myJars/learning-1.0-SNAPSHOT.jar
+#./bin/spark-submit \
+# --master spark://spark-master:7077 \
+# --class com.bigData.spark.core.wordCount /opt/bigData/spark/myJars/learning-1.0-SNAPSHOT.jar
 

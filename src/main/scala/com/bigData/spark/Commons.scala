@@ -7,7 +7,7 @@ object Commons {
   Logger.getLogger("dd").setLevel(Level.ERROR)
   val sparkSession = SparkSession
       .builder()
-//      .master("local[*]")
+      .master("local[*]")
       .getOrCreate()
 
   val dataPath = "/Users/xuxliu/Ifoods/scala/spark/myDevEnv/src/main/data/"
