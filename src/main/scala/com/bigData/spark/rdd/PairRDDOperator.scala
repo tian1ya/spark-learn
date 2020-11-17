@@ -1,4 +1,4 @@
-package com.bigData.spark.core
+package com.bigData.spark.rdd
 
 import com.bigData.spark.Commons
 import org.apache.spark.HashPartitioner

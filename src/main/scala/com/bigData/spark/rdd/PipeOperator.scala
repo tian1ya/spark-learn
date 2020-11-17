@@ -1,12 +1,13 @@
-package com.bigData.spark.core
+package com.bigData.spark.rdd
 
 import com.bigData.spark.Commons
 import org.apache.spark.rdd.RDD
 
-object GlomOperator {
+object PipeOperator {
 
   /*
-
+      Pipe 管道，针对每个分区，将RDD的每个数据通过管道传递给shell 命令或者脚本，
+      返回输出RDD，一个分区执行一次这个命令
    */
   def main(args: Array[String]): Unit = {
 
