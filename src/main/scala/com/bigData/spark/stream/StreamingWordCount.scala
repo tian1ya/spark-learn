@@ -17,7 +17,6 @@ object StreamingWordCount {
       .builder()
       .master("local[2]")
       // 这里的 core 至少需要有2个，因为一个被 receiver 占了，剩下的被计算逻辑占用
-      //
       .getOrCreate()
 
     val sc = spark.sparkContext
@@ -31,6 +30,7 @@ object StreamingWordCount {
     val lines: ReceiverInputDStream[String] = ssc.socketTextStream("localhost", 9999)
 
     // 实时的 wordcount
+    // flatMap operation is applied on each RDD in the lines DStream to generate the RDDs of the words DStream.
     val value: DStream[String] = lines.flatMap(_.split(" "))
     val value1: DStream[(String, Int)] = value.map(a => (a, 1))
 
@@ -44,51 +44,6 @@ object StreamingWordCount {
     // 让程序一直运行, 将Driver 挂起
     ssc.awaitTermination()
 
-
-//    import spark.implicits._
-//
-//    val streamReader: DataStreamReader = spark.readStream
-//
-//    val lines: DataFrame = streamReader
-//      .format("socket")
-//      .option("host", "localhost")
-//      .option("port", 7777)
-//      .option("includeTimestamp", value = true) //输出内容包括时间戳
-//      .load()
-//
-//
-//    val words: DataFrame = lines.as[(String, Timestamp)]
-//      .flatMap(line => line._1.split(", ").map(word => (word, line._2)))
-//      .toDF("word", "timestamp")
-//
-//
-//    val windowSize = 10
-//    val slideSize = 5
-//    val windowDuration = s"$windowSize seconds"
-//    val slideDuration = s"$slideSize seconds"
-//
-//
-//    val wordCount: DataFrame = words
-//      .withWatermark("timestamp", "10 minutes")// 定义 wm
-//      .groupBy(
-//        window($"timestamp", windowDuration, slideDuration)
-//        // 分别指明了事件事件列，窗口size，slide
-//      ).count()
-//
-//    val orderedWordCount = wordCount.orderBy("window")
-//
-//    /*
-//      由于采用聚合操作，所以需要指定"complete"输出形式。
-//      非聚合操作只能用appen模式
-//     */
-//
-//
-//    val query: StreamingQuery = orderedWordCount.writeStream
-//      .outputMode(OutputMode.Complete().toString)
-//      .format("console")
-//      .start()
-//
-//    query.awaitTermination()
-
+    ssc.stop()
   }
 }
