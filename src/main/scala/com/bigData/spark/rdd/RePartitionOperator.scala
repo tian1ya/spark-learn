@@ -27,7 +27,7 @@ object RePartitionOperator {
 
       coalesce 默认只能缩小分区，不能扩大，如果给的新的分区个数大于原来的分区个数，那么分区个数还会保持原来的分区个数
 
-      因为将数据分区个数从大到小一定会有 shuffle 过程，而将分区大到小，却不一定发生shuffle 过程，
+      因为将数据分区个数从小到大一定会有 shuffle 过程，而将分区大到小，却不一定发生shuffle 过程，
 
       所以 coalesce 就会有第二参数指定是否发生 shuffle, 默认情况下不shuffle 过程
 

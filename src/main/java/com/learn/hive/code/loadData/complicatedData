@@ -1,0 +1,16 @@
+{
+    "name":"songsong",
+    "friends": ["bingbing", "lili"],
+    "children":{
+        "xiao song":12,
+        "xiaoxiao song":19
+    }
+    "address": {
+        "street":"huilonguan",
+        "city":"beiging"
+    }
+}
+
+---- 在导数据的时候，应该将数据转换为
+songsong,bingbing_lili, xiao song:18_xiaoxiao song:19, hui long guan_beijing
+yangyang,caicai_susu, xiao yang:18_xiaoxiao song:19,chao yang_beijing
