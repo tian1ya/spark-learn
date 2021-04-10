@@ -1,4 +1,4 @@
-package com.bigData.spark.stream.practice
+package com.bigData.spark.stream.kafkaPractice
 
 
 import com.alibaba.druid.pool.DruidDataSourceFactory

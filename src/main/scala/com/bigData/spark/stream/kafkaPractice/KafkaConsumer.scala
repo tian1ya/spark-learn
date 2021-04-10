@@ -1,4 +1,4 @@
-package com.bigData.spark.stream.practice
+package com.bigData.spark.stream.kafkaPractice
 
 import org.apache.kafka.clients.consumer.{ConsumerConfig, ConsumerRecord}
 import org.apache.spark.sql.SparkSession

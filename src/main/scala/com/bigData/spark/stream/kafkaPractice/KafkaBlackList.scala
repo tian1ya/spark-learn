@@ -1,4 +1,4 @@
-package com.bigData.spark.stream.practice
+package com.bigData.spark.stream.kafkaPractice
 
 import org.apache.commons.lang.time.FastDateFormat
 import org.apache.kafka.clients.consumer.{ConsumerConfig, ConsumerRecord}
@@ -27,9 +27,10 @@ case class AdClink(ts: String, area: String, city: String, user: String, ad: Str
 
 object KafkaBlackList {
 
-  val df = new FastDateFormat("yyyy-MM-dd")
 
   def main(args: Array[String]): Unit = {
+
+
     val spark = SparkSession
       .builder()
       .master("local[2]")
@@ -101,13 +102,15 @@ object KafkaBlackList {
 
       val rddWithUserNotInBlackList = rdd.filter(data => !userInBlackList.contains(data.user))
 
+//      val df = new FastDateFormat("yyyy-MM-dd")
+
       rddWithUserNotInBlackList.map(data => {
-        val dateStr = df.format(data.ts.toLong)
+//        val dateStr = df.format(data.ts.toLong)
         val user = data.user
         val area = data.area
         val city = data.city
         val ad = data.ad
-        ((dateStr, user, ad), 1)
+        ((data.ts, user, ad), 1)
       })
         .reduceByKey(_ + _)
     })

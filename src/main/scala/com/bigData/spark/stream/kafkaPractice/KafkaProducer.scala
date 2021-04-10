@@ -1,4 +1,4 @@
-package com.bigData.spark.stream.practice
+package com.bigData.spark.stream.kafkaPractice
 
 import org.apache.kafka.clients.producer.{KafkaProducer, ProducerConfig, ProducerRecord}
 
