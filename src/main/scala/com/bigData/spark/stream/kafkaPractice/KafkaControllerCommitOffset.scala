@@ -40,6 +40,19 @@ object KafkaControllerCommitOffset {
     )
 
     // 偏移量只有在和 kafka 读取到的第一个 RDD 中可以拿到 offset
+    // foreachRDD 既不是 tramsformation 也不是 action 会周期性的调用
+    // 传入的函数中既有在 Driver 中执行，或者和提交 offset
+    // 也有在集群中调用
+    // kafkaDs 周期性生成 rdd，在每一个DStream 中都维护了一个 private[streaming] var generatedRDDs = new HashMap[Time, RDD[T]]()
+    // 存储着一个时间对应的哪个 rdd
+    // 当一个批次执行结束了，会将 generatedRDDs 的数据清除掉，不然数据会越来越累积太多
+    // 计算的时候根据这个时间，取出来rdd，然后将函数在这个 rdd 中进行的操作
+    /*
+      随便点开一个 DStream 中的函数点进去查看 compute 方法就可以看到了
+        override def compute(validTime: Time): Option[RDD[U]] = {
+          parent.getOrCompute(validTime).map(_.flatMap(flatMapFunc))
+        }
+     */
     kafkaDs.foreachRDD(rdd => {
       // 这段代码是在 Driver 端执行的
       if (!rdd.isEmpty()) {
@@ -47,6 +60,7 @@ object KafkaControllerCommitOffset {
         // 先将 rdd 强转为 HasOffsetRanges，这是一个 kafka 的一个 rdd KafkaRDD，实现继承了 spark 的rdd
         // KafkaRDD 中的 compute 方法中获取 kafka 的消息
         // 如果是一个普通的 rdd 那么无法转换的，
+        //
         val offsetRanges: Array[OffsetRange] = rdd.asInstanceOf[HasOffsetRanges].offsetRanges
         // 保存的信息
         /*
@@ -67,7 +81,7 @@ object KafkaControllerCommitOffset {
         rdd.map(_.value()).flatMap(_.split(" ")).map((_, 1)).reduceByKey(_ + _)
           .foreach(println)
 
-        // 在 Driver 端异步的更新偏移量，实现这个接口的 是 DirectKafkaInputDStream
+        // 在 Driver 端异步的更新偏移量，实现这个接口的 是 DirectKafkaInputDStream，包括这里使用的 还是第一手的 刚开始读进来数据的哪个 RDD
         kafkaDs.asInstanceOf[CanCommitOffsets].commitAsync(offsetRanges)
       }
     })
