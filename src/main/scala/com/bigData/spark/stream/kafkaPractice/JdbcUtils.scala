@@ -16,9 +16,9 @@ object JdbcUtils {
     val properties = new Properties()
 
     properties.setProperty("driverClassName", "com.mysql.jdbc.Driver");
-    properties.setProperty("url", "jdbc.mysql://localhost:3306/sparkstreaming");
+    properties.setProperty("url", "jdbc.mysql://localhost:3306/bigdata");
     properties.setProperty("username", "root");
-    properties.setProperty("password", "liuxu123");
+    properties.setProperty("password", "123456");
 
     DruidDataSourceFactory.createDataSource(properties);
   }
