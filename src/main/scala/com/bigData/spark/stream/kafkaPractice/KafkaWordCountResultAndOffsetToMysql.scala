@@ -2,13 +2,15 @@ package com.bigData.spark.stream.kafkaPractice
 
 import com.bigData.spark.stream.kafkaPractice.JdbcUtils.getConnection
 import org.apache.kafka.clients.consumer.{ConsumerConfig, ConsumerRecord}
+import org.apache.kafka.common.TopicPartition
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.SparkSession
 import org.apache.spark.streaming.dstream.{DStream, InputDStream}
 import org.apache.spark.streaming.kafka010.{ConsumerStrategies, HasOffsetRanges, KafkaUtils, LocationStrategies, OffsetRange}
 import org.apache.spark.streaming.{Seconds, StreamingContext}
 
-import java.sql.{Connection, DriverManager, PreparedStatement}
+import java.sql.{Connection, DriverManager, PreparedStatement, ResultSet}
+import scala.collection.mutable
 
 object KafkaWordCountResultAndOffsetToMysql {
   def main(args: Array[String]): Unit = {
@@ -40,11 +42,44 @@ object KafkaWordCountResultAndOffsetToMysql {
     )
 
     // key 可以有，可以没有，key 可以在分区器中使用，没有key 采用轮询的方式将 value 写到分区中
+
+    val offset = new mutable.HashMap[TopicPartition, Long]()
+    var connection11: Connection = null
+    var statement: PreparedStatement = null
+    try {
+      connection11 = DriverManager.getConnection("jdbc:mysql://localhost:3306/bigdata", "root", "123456")
+      statement = connection11.prepareStatement("select  topic_partition, `offset` from t_kafka_offset where appId_groupID=?")
+      statement.setString(1, appName + groupId)
+
+      val resultSet: ResultSet = statement.executeQuery()
+      while (resultSet.next()) {
+        val topicPartition = resultSet.getString(1)
+        val topicAndPartition: Array[String] = topicPartition.split("_")
+        val offsetNumber = resultSet.getInt(2)
+
+        val topicPartition1: TopicPartition = new TopicPartition(topicAndPartition(0), topicAndPartition(1).toInt)
+        offset(topicPartition1) = offsetNumber
+      }
+    } catch {
+      case e: Exception => {
+        e.printStackTrace()
+      }
+    } finally {
+      if (statement != null) statement.close()
+      if (connection11 != null) connection11.close()
+    }
+
+
     val kafkaDs: InputDStream[ConsumerRecord[String, String]] = KafkaUtils.createDirectStream[String, String](
       ssc,
       LocationStrategies.PreferConsistent, // 位置策略
-      ConsumerStrategies.Subscribe[String, String](Set("sparkstreaming"), kafkaParams) // 指定 topic 和 kafka 相关参数
+      ConsumerStrategies.Subscribe[String, String](Set("sparkstreaming"),
+        kafkaParams, // 指定 topic 和 kafka 相关参数
+        offset,
+      )
     )
+
+    // 创建的时候，如果给了偏移量，那么从偏移量开始读，否则从kafka 中的 __consumer_offset 开始读
 
     kafkaDs.foreachRDD(foreachFunc = rdd => {
       if (!rdd.isEmpty()) {
