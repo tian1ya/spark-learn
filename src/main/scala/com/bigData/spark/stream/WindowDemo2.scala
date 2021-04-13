@@ -35,11 +35,7 @@ object WindowDemo2 {
 
 
     // 是属于有状态计算
-    val value1: DStream[(String, Int)] = value.reduceByKeyAndWindow(
-      (x: Int, y:Int) => x+y,
-      (x: Int, y: Int) => x-y,
-      Seconds(6),Seconds(6)
-    )
+    val value1: DStream[(String, Int)] = value.reduceByKeyAndWindow((x: Int, y:Int) => x+y, (x: Int, y: Int) => x-y, Seconds(6),Seconds(6))
 //    val value1: DStream[(String, Int)] = value.window(Seconds(9), Seconds(3))
     val value2: DStream[(String, Int)] = value1.reduceByKey(_ + _)
 
