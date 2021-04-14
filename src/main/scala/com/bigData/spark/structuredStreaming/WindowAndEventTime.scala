@@ -19,10 +19,21 @@ case class DeviceData2(windowStartTimeStr: String, windowEndTimeStr: String, dev
     b bbb 233 1547718102
     b bbb 233 1547718104
     b bbb 233 1547718105
+    d ads 234 1547718109
 
     b bbb 233 1547718106
+    b bbb 233 1547718107
+    b bbb 233 1547718108
+    b bbb 233 1547718109
+    b bbb 233 1547718111
+    b bbb 233 1547718112
+    b bbb 233 1547718113
     b bbb 233 1547718103
     b bbb 233 1547718108
+    b bbb 233 1547718109
+    b bbb 233 1547718112
+    b aaa 233 1547718113
+    b aaa 233 1547718130
 
  */
 
@@ -102,10 +113,18 @@ object WindowAndEventTime extends App {
 
   val query = dff
     .writeStream
-    .outputMode(OutputMode.Complete())
-    // 切换 结果输出方式  Append 或者 Update 模式，看看不一致情况
+    .outputMode(OutputMode.Append())
     .format("console")
     .start()
+  /*
+      切换 结果输出方式  Append 或者 Update 模式，看看不一致情况
+      Complete: 总是会全量输出，但是迟到大于延迟的数据应该删除的，但是并没有删除
+            The whole Result Table will be outputted to the sink after every trigger.
+      Append：default，当一个窗口结束的时候才会有结果输出，但是中间没输入一个数据就会print 一个空结果
+              知道窗口关闭的时候，才输出最终窗口统计结果
+      Update：每输入一条数据，就会输出一个结果，关闭窗口后，延迟大于延迟设定数据丢失
+            Only the rows in the Result Table that were updated
+   */
 
   query.awaitTermination()
 
