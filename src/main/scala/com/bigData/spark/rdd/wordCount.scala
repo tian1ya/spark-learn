@@ -65,7 +65,7 @@ object wordCount {
     val tuples = value.map(x => (x, 1)).reduceByKey(_ + _)
     tuples.collect()
 
-//    value.cache()
+    value.cache()
 //
 //    value.unpersist()
 

@@ -4,13 +4,24 @@ import org.apache.spark.SparkContext
 import org.apache.spark.sql.streaming.{OutputMode, StreamingQuery}
 import org.apache.spark.sql.{DataFrame, Dataset, SparkSession}
 
-case class DeviceData3(device: String, deviceType: String, signal: Double, time: Long)
+case class DeviceData3www(device: String, deviceType: String, signal: Double, time: Long)
 
-case class DeviceData4(device: String, deviceType: String, age: Long)
+case class DeviceData4dd(device: String, deviceType: String, age: Long)
 
-object Joins extends App {
+object StreamStreamJoidddn extends App {
 
   /*
+      for both the input streams, we buffer past input as streaming state,
+      so that we can match every future input with past input and accordingly generate joined results
+
+      但是这里带来的新问题就是，数据的状态会一直一直的增加，显然是不合理的(unbound state)
+      所以在 join 的时候需要制定一个另外的条件，这个条件表示当前 join 的范围的数据，而在范围外的数据是不可以参与join 的，也就是这部分数据的 state 不需要
+      保持了，你可以
+      1. 设置 watermark 来接受一定范围内迟到的数据
+      2. 基于 eventTime 设置条件 join，这样选出一定范围时间的state 数据才会去 join
+        Time range join conditions (e.g. ...JOIN ON leftTime BETWEEN rightTime AND rightTime + INTERVAL 1 HOUR),
+        Join on event-time windows (e.g. ...JOIN ON leftTimeWindow = rightTimeWindow).
+
       b bbb 3
       b bbb 8
       b aaa 6
