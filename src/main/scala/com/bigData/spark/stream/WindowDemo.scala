@@ -10,7 +10,7 @@ object WindowDemo {
 
     val spark = SparkSession
       .builder()
-      .master("local[2]")
+      .master("local[*]")
       // 这里的 core 至少需要有2个，因为一个被 receiver 占了，剩下的被计算逻辑占用
       .getOrCreate()
 

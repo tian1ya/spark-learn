@@ -1,5 +1,6 @@
 package com.bigData.spark.stream
 
+import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.SparkSession
 import org.apache.spark.streaming.{Seconds, StreamingContext}
 import org.apache.spark.streaming.dstream.{DStream, ReceiverInputDStream}
@@ -28,7 +29,10 @@ object TransformAPI {
     // 由于在 DStream 中有时候也需要很多的 api，但是呢，这些 api 在rdd 中已经实现了
     // 所以在 DStream 在实现一遍就有些冗余了，所以如果在 DStream 中能够获得底层的 rdd
     // 并且可以操作，实现一些功能，那么就加强了 DStream 的功能
-    val value: DStream[String] = lines.transform(rdd => rdd)
+    val value: DStream[String] = lines.transform((rdd: RDD[String]) => {
+      // 若干基于rdd 的操作
+      rdd
+    })
 
     // 开启
     ssc.start()
